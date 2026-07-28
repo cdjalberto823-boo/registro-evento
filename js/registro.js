@@ -8,7 +8,7 @@ const mesasData = {
 let contadorFolio = 0;
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Cargar cupos existentes si los hay en el navegador
+    // Cargar registros almacenados previamente para restar cupos automáticamente
     const registrosPrevios = JSON.parse(localStorage.getItem("asistentes_czm")) || [];
     registrosPrevios.forEach(reg => {
         if (mesasData[reg.mesa]) {
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     inicializarFormulario();
 });
 
-// Renderizar puntos/asientos en las tarjetas
+// Renderizar puntos/asientos alrededor de la mesa
 function renderizarAsientos() {
     const mapaIds = {
         "Mesa 1": "mesa1",
@@ -45,6 +45,7 @@ function renderizarAsientos() {
                 silla.classList.add("silla-dot");
                 silla.classList.add(i < info.ocupados ? "ocupado" : "disponible");
 
+                // Distribución visual de los 15 asientos: 8 arriba y 7 abajo
                 if (i < 8) {
                     topContainer.appendChild(silla);
                 } else {
@@ -89,7 +90,7 @@ function actualizarInterfazLugares() {
     renderizarAsientos();
 }
 
-// Selección visual de tarjetas
+// Selección visual interactiva de tarjetas
 function inicializarSeleccionMesas() {
     const tarjetasMesa = document.querySelectorAll(".mesa-card");
     const campoMesaOculto = document.getElementById("mesaSeleccionada");
@@ -111,7 +112,7 @@ function inicializarSeleccionMesas() {
     });
 }
 
-// Procesar el registro y desplegar modal con botón Aceptar
+// Procesar el registro y abrir el modal con resumen de confirmación
 function inicializarFormulario() {
     const btnRegistrar = document.getElementById("btnRegistrar");
 
@@ -134,7 +135,7 @@ function inicializarFormulario() {
                 return;
             }
 
-            // Actualizar disponibilidad
+            // Actualizar disponibilidad interna
             if (mesasData[mesaSeleccionada]) {
                 mesasData[mesaSeleccionada].ocupados++;
                 actualizarInterfazLugares();
@@ -144,7 +145,7 @@ function inicializarFormulario() {
             contadorFolio++;
             const folioFormateado = `CZM-${String(Date.now()).slice(-5)}`;
 
-            // Guardar registro en localStorage
+            // Guardar en localStorage
             const nuevoRegistro = {
                 folio: folioFormateado,
                 nombre: nombre,
@@ -158,22 +159,22 @@ function inicializarFormulario() {
             registrosGuardados.push(nuevoRegistro);
             localStorage.setItem("asistentes_czm", JSON.stringify(registrosGuardados));
 
-            // Rellenar datos en el Modal
+            // Cargar datos en los elementos del Modal
             document.getElementById("modalFolio").textContent = folioFormateado;
             document.getElementById("modalNombre").textContent = nombre;
             document.getElementById("modalCargo").textContent = cargo;
             document.getElementById("modalMesa").textContent = mesaSeleccionada;
 
-            // Desplegar el modal Bootstrap
+            // Desplegar el Modal de Bootstrap
             const modalConfirmacion = new bootstrap.Modal(document.getElementById('modalConfirmacion'));
             modalConfirmacion.show();
 
-            // Limpiar formulario al cerrar el modal o dar clic en Aceptar
+            // Limpiar campos automáticamente cuando el modal se cierre (al dar clic en Aceptar)
             document.getElementById('modalConfirmacion').addEventListener('hidden.bs.modal', function () {
                 document.getElementById("registroForm").reset();
                 document.querySelectorAll(".mesa-card").forEach(m => m.classList.remove("seleccionada"));
                 document.getElementById("mesaSeleccionada").value = "";
-            });
+            }, { once: true });
         });
     }
 }

@@ -1,0 +1,157 @@
+/* Fondo institucional unificado */
+body {
+    background: url('../img/fondo-camara.jpg') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Poppins', sans-serif;
+    color: #2b2b2b;
+}
+
+/* Barra superior verde */
+.navbar {
+    background-color: #004d43 !important;
+    padding: 14px 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.titulo-principal {
+    color: #004d43;
+}
+
+/* Tarjeta contenedora blanca traslúcida */
+.card-registro {
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(6px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* Inputs de texto */
+.form-control:focus {
+    border-color: #004d43;
+    box-shadow: 0 0 0 0.25rem rgba(0, 77, 67, 0.15);
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    color: #004d43;
+}
+
+/* Tarjetas de Mesa Originales */
+.mesa-card {
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 16px 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    height: 100%;
+}
+
+.mesa-card:hover {
+    border-color: #004d43;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 77, 67, 0.12);
+}
+
+.mesa-titulo {
+    color: #004d43;
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 2px;
+}
+
+.mesa-sub {
+    color: #555;
+    font-size: 0.88rem;
+    margin-bottom: 4px;
+}
+
+.modera-text {
+    color: #6c757d;
+    font-size: 0.8rem;
+    display: block;
+    margin-bottom: 8px;
+}
+
+/* Diseño de las Sillas / Bolitas Verdes */
+.sillas-grid {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.silla {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.silla.disponible {
+    background-color: #10b981; /* Verde brillante para sillas libres */
+}
+
+.silla.ocupada {
+    background-color: #ef4444; /* Rojo si estuviera ocupada */
+}
+
+/* Cápsula central gris para el ícono */
+.capsula-icono {
+    background-color: #eef2f6;
+    border: 1.5px dashed #cbd5e1;
+    border-radius: 20px;
+    padding: 6px 0;
+    color: #475569;
+    width: 80%;
+    margin: 0 auto;
+}
+
+/* Barra de progreso inferior */
+.barra-progreso-contenedor {
+    width: 100%;
+    height: 4px;
+    background-color: #e2e8f0;
+    border-radius: 2px;
+    margin-top: 10px;
+    margin-bottom: 6px;
+    overflow: hidden;
+}
+
+.barra-progreso {
+    height: 100%;
+    background-color: #10b981;
+}
+
+.cupos-texto {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+/* Estado Seleccionado */
+.mesa-card.seleccionada {
+    border-color: #004d43 !important;
+    background-color: #f0fdf4 !important;
+    box-shadow: 0 0 0 3px rgba(0, 77, 67, 0.2);
+}
+
+/* Botón Registrar Asistencia */
+.btn-registro-pro {
+    background-color: #004d43;
+    color: #ffffff;
+    border: none;
+    padding: 12px 38px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 77, 67, 0.3);
+}
+
+.btn-registro-pro:hover {
+    background-color: #00332c;
+    color: #ffffff;
+    transform: translateY(-2px);
+}

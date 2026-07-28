@@ -1,0 +1,80 @@
+/* Configuración del Fondo usando la imagen de la Cámara */
+body {
+    background: url('../img/fondo-camara.jpg') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Poppins', sans-serif;
+    color: #2b2b2b;
+}
+
+/* Barra Verde Superior */
+.navbar-top {
+    background-color: #004d43; /* Verde institucional extraído de la cenefa */
+    padding: 16px 0;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Subtítulo CÁMARA DE DIPUTADOS */
+.subtitulo-camara {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #004d43;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Título Principal */
+.titulo-portada {
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1.25;
+}
+
+/* Descripción secundaria */
+.descripcion-portada {
+    font-size: 1.25rem;
+    color: #4a4a4a;
+    font-weight: 500;
+}
+
+/* Iconos y textos de la fecha/lugar */
+.info-evento {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2d2d2d;
+}
+
+.icono-info {
+    color: #d4af37; /* Amarillo/Dorado para resaltar los iconos */
+    font-size: 1.3rem;
+}
+
+/* Botón Registrarme en Verde */
+.btn-registrarme {
+    background-color: #004d43;
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 12px 38px;
+    border-radius: 12px;
+    border: none;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 77, 67, 0.3);
+}
+
+.btn-registrarme:hover {
+    background-color: #00332c;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 77, 67, 0.4);
+}
+/* Tamaño y responsividad para el logo de la derecha */
+.img-logo-portada {
+    max-width: 320px;
+    width: 100%;
+    height: auto;
+    display: inline-block;
+    filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.1));
+}

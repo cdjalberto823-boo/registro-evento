@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Panel de Administración | Listas por Mesa</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background: url('img/fondo-camara.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Poppins', sans-serif;
+            color: #2b2b2b;
+            min-height: 100vh;
+        }
+
+        /* Encabezado Verde Institucional */
+        .header-admin {
+            background-color: #004d43;
+            color: white;
+            padding: 16px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Contenedor de la tabla */
+        .card-table {
+            border: none;
+            border-radius: 0 0 16px 16px;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(6px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Estilos de Pestañas (Tabs) */
+        .nav-tabs {
+            border-bottom: none;
+        }
+
+        .nav-tabs .nav-link {
+            color: #2b2b2b;
+            font-weight: 600;
+            border-radius: 12px 12px 0 0;
+            padding: 12px 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+            margin-right: 4px;
+            border: none;
+        }
+
+        .nav-tabs .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.94);
+            color: #004d43;
+            font-weight: 700;
+            border-top: 3px solid #004d43;
+        }
+
+        /* Tabla */
+        .table-dark-verde {
+            background-color: #004d43 !important;
+            color: white !important;
+        }
+
+        .badge-mesa {
+            background-color: #004d43;
+            border: 1px solid #d4af37;
+            color: white;
+        }
+
+        /* Modal de Acceso */
+        .modal-access {
+            backdrop-filter: blur(8px);
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-verde {
+            background-color: #004d43;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn-verde:hover {
+            background-color: #00332c;
+            color: white;
+        }
+
+        /* Reglas de Impresión Limpia */
+        @media print {
+            .no-imprimir {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+            }
+            .card-table {
+                box-shadow: none;
+                border: none;
+                background: white !important;
+            }
+            .encabezado-impresion {
+                display: block !important;
+            }
+        }
+
+        .encabezado-impresion {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- MODAL DE AUTENTICACIÓN -->
+    <div class="modal fade show modal-access" id="loginModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" style="display: block;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                <div class="modal-header text-white" style="background-color: #004d43; border-radius: 16px 16px 0 0;">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-shield-lock-fill me-2"></i>Acceso Restringido</h5>
+                </div>
+                <div class="modal-body p-4 text-center">
+                    <p class="text-muted mb-3">Ingrese el código de acceso de administrador para ver las listas de registro.</p>
+                    <form id="formLogin" onsubmit="validarAcceso(event)">
+                        <div class="mb-3">
+                            <input type="password" id="adminPassword" class="form-control form-control-lg text-center" placeholder="Código de Acceso" required autofocus>
+                        </div>
+                        <div id="errorMsg" class="text-danger small mb-3 d-none">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i> Código incorrecto. Intente nuevamente.
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-verde btn-lg">Ingresar al Panel</button>
+                            <a href="registro.html" class="btn btn-link text-decoration-none text-muted">Volver al Registro</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENIDO DEL PANEL (Oculto hasta validar contraseña) -->
+    <div id="panelContent" class="d-none">
+
+        <!-- Header del Panel -->
+        <header class="header-admin no-imprimir">
+            <div class="container d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-shield-lock-fill me-2"></i>Panel de Control de Registros</h5>
+                <a href="registro.html" class="btn btn-outline-light btn-sm"><i class="bi bi-arrow-left me-1"></i> Ir al Registro</a>
+            </div>
+        </header>
+
+        <div class="container py-4">
+
+            <!-- Formato Oficial de Impresión (Solo visible al mandar a imprimir) -->
+            <div class="encabezado-impresion text-center mb-4">
+                <h3 class="fw-bold text-uppercase mb-1">CÁMARA DE DIPUTADOS · LXVI LEGISLATURA</h3>
+                <h5>Comisión de Zonas Metropolitanas</h5>
+                <p class="mb-0">Mesa Interparlamentaria para la Gestión y Desarrollo de las Zonas Metropolitanas en México</p>
+                <hr>
+                <h4 class="fw-bold mt-3" id="tituloImpresion">Lista de Asistencia</h4>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="d-flex justify-content-between align-items-center mb-3 no-imprimir">
+                <h5 class="fw-bold mb-0 text-dark">Categorías por Mesa</h5>
+                <div>
+                    <button class="btn btn-dark me-2" onclick="window.print()">
+                        <i class="bi bi-printer-fill me-2"></i>Imprimir Categoría Actual
+                    </button>
+                    <button class="btn btn-outline-danger" onclick="limpiarRegistros()">
+                        <i class="bi bi-trash-fill me-1"></i> Limpiar Todo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pestañas por Mesa -->
+            <ul class="nav nav-tabs no-imprimir" id="mesasTabs">
+                <li class="nav-item">
+                    <button class="nav-link active" onclick="filtrarMesa('Mesa 1')">Mesa 1: Gobernanza</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" onclick="filtrarMesa('Mesa 2')">Mesa 2: Financiamiento</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" onclick="filtrarMesa('Mesa 3')">Mesa 3: Planeación</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" onclick="filtrarMesa('Mesa 4')">Mesa 4: Evaluación</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" onclick="filtrarMesa('Todas')">Todas las Mesas</button>
+                </li>
+            </ul>
+
+            <!-- Tabla de Registros -->
+            <div class="card card-table">
+                <div class="card-body p-4">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle">
+                            <thead class="table-dark-verde">
+                                <tr>
+                                    <th>Folio</th>
+                                    <th>Nombre Completo</th>
+                                    <th>Cargo</th>
+                                    <th>Teléfono</th>
+                                    <th>Mesa</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaCuerpo">
+                                <!-- Datos cargados con JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Script de Autenticación y Carga -->
+    <script>
+        // Contraseña por defecto para ingresar
+        const CODIGO_CORRECTO = "admin123"; 
+        let mesaActual = 'Mesa 1';
+
+        function validarAcceso(event) {
+            event.preventDefault();
+            const passwordInput = document.getElementById("adminPassword").value;
+            const errorMsg = document.getElementById("errorMsg");
+
+            if (passwordInput === CODIGO_CORRECTO) {
+                document.getElementById("loginModal").classList.remove("show");
+                document.getElementById("loginModal").style.display = "none";
+                document.getElementById("panelContent").classList.remove("d-none");
+                filtrarMesa('Mesa 1');
+            } else {
+                errorMsg.classList.remove("d-none");
+            }
+        }
+
+        function filtrarMesa(nombreMesa) {
+            mesaActual = nombreMesa;
+            
+            const links = document.querySelectorAll('.nav-tabs .nav-link');
+            links.forEach(link => {
+                if(link.textContent.includes(nombreMesa) || (nombreMesa === 'Todas' && link.textContent.includes('Todas'))) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+
+            document.getElementById("tituloImpresion").textContent = 
+                nombreMesa === 'Todas' ? 'Lista General de Asistencia' : `Lista de Asistencia — ${nombreMesa}`;
+
+            cargarDatos();
+        }
+
+        function cargarDatos() {
+            const registros = JSON.parse(localStorage.getItem("asistentes_czm")) || [];
+            const tablaCuerpo = document.getElementById("tablaCuerpo");
+
+            const filtrados = mesaActual === 'Todas' 
+                ? registros 
+                : registros.filter(r => r.mesa === mesaActual);
+
+            tablaCuerpo.innerHTML = "";
+
+            if (filtrados.length === 0) {
+                tablaCuerpo.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-5">
+                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                            No hay personas registradas aún en esta categoría.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            filtrados.forEach((reg) => {
+                const fila = document.createElement("tr");
+                fila.innerHTML = `
+                    <td><span class="badge bg-secondary">${reg.folio || 'N/A'}</span></td>
+                    <td class="fw-bold">${reg.nombre}</td>
+                    <td>${reg.cargo}</td>
+                    <td>${reg.telefono}</td>
+                    <td><span class="badge badge-mesa">${reg.mesa}</span></td>
+                `;
+                tablaCuerpo.appendChild(fila);
+            });
+        }
+
+        function limpiarRegistros() {
+            if (confirm("¿Está seguro de borrar todos los registros recopilados?")) {
+                localStorage.removeItem("asistentes_czm");
+                cargarDatos();
+            }
+        }
+    </script>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

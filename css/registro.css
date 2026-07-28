@@ -75,26 +75,33 @@ body {
     margin-bottom: 8px;
 }
 
-/* Diseño de las Sillas / Bolitas Verdes */
+/* Diseño de las Sillas / Bolitas Verdes (Corregido para coincidir con JS) */
 .sillas-grid {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 5px;
+    min-height: 12px;
 }
 
-.silla {
+.silla-dot {
     width: 9px;
     height: 9px;
     border-radius: 50%;
     display: inline-block;
+    transition: all 0.2s ease;
 }
 
-.silla.disponible {
-    background-color: #10b981; /* Verde brillante para sillas libres */
+/* Verde brillante para disponibles */
+.silla-dot.disponible {
+    background-color: #10b981; 
+    box-shadow: 0 0 2px rgba(16, 185, 129, 0.4);
 }
 
-.silla.ocupada {
-    background-color: #ef4444; /* Rojo si estuviera ocupada */
+/* Gris o Rojo para ocupadas */
+.silla-dot.ocupado,
+.silla-dot.ocupada {
+    background-color: #cbd5e1;
 }
 
 /* Cápsula central gris para el ícono */
@@ -105,7 +112,7 @@ body {
     padding: 6px 0;
     color: #475569;
     width: 80%;
-    margin: 0 auto;
+    margin: 4px auto;
 }
 
 /* Barra de progreso inferior */

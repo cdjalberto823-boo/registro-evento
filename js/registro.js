@@ -123,10 +123,12 @@ function inicializarFormulario() {
             const nombre = document.getElementById("nombre").value.trim();
             const cargo = document.getElementById("cargo").value.trim();
             const telefono = document.getElementById("telefono").value.trim();
+            const correo = document.getElementById("correo").value.trim();
             const mesaSeleccionada = document.getElementById("mesaSeleccionada").value;
 
-            if (!nombre || !cargo || !telefono) {
-                alert("⚠️ Por favor completa tu Nombre, Cargo y Teléfono.");
+            // Validación de todos los campos obligatorios
+            if (!nombre || !cargo || !telefono || !correo) {
+                alert("⚠️ Por favor completa todos los campos del formulario (Nombre, Cargo, Teléfono y Correo).");
                 return;
             }
 
@@ -145,12 +147,13 @@ function inicializarFormulario() {
             contadorFolio++;
             const folioFormateado = `CZM-${String(Date.now()).slice(-5)}`;
 
-            // Guardar en localStorage
+            // Guardar registro completo en localStorage (incluyendo correo)
             const nuevoRegistro = {
                 folio: folioFormateado,
                 nombre: nombre,
                 cargo: cargo,
                 telefono: telefono,
+                correo: correo,
                 mesa: mesaSeleccionada,
                 fecha: new Date().toLocaleString('es-MX')
             };

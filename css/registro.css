@@ -37,7 +37,7 @@ body {
     color: #004d43;
 }
 
-/* Tarjetas de Mesa Originales */
+/* Tarjetas de Mesa Alineadas con Flexbox */
 .mesa-card {
     background: #ffffff;
     border: 2px solid #e2e8f0;
@@ -47,6 +47,9 @@ body {
     cursor: pointer;
     position: relative;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .mesa-card:hover {
@@ -68,14 +71,24 @@ body {
     margin-bottom: 4px;
 }
 
+/* Área del moderador con altura fija para nivelar todas las tarjetas */
 .modera-text {
     color: #6c757d;
     font-size: 0.8rem;
-    display: block;
     margin-bottom: 8px;
+    min-height: 110px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-/* Diseño de las Sillas / Bolitas Verdes (Corregido para coincidir con JS) */
+/* Contenedor alineado en la parte inferior */
+.mesa-footer-info {
+    margin-top: auto;
+    width: 100%;
+}
+
+/* Diseño de las Sillas / Bolitas Verdes */
 .sillas-grid {
     display: flex;
     justify-content: center;

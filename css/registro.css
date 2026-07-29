@@ -88,44 +88,15 @@ body {
     width: 100%;
 }
 
-/* Diseño de las Sillas / Bolitas Verdes */
-.sillas-grid {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 5px;
-    min-height: 12px;
+/* Estilos para el plano SVG dinámico */
+.mesa-svg-plano {
+    max-width: 180px;
+    margin: 0 auto;
+    display: block;
 }
 
-.silla-dot {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    display: inline-block;
-    transition: all 0.2s ease;
-}
-
-/* Verde brillante para disponibles */
-.silla-dot.disponible {
-    background-color: #10b981; 
-    box-shadow: 0 0 2px rgba(16, 185, 129, 0.4);
-}
-
-/* Gris o Rojo para ocupadas */
-.silla-dot.ocupado,
-.silla-dot.ocupada {
-    background-color: #cbd5e1;
-}
-
-/* Cápsula central gris para el ícono */
-.capsula-icono {
-    background-color: #eef2f6;
-    border: 1.5px dashed #cbd5e1;
-    border-radius: 20px;
-    padding: 6px 0;
-    color: #475569;
-    width: 80%;
-    margin: 4px auto;
+.silla-node {
+    transition: fill 0.3s ease, transform 0.2s ease;
 }
 
 /* Barra de progreso inferior */
@@ -142,6 +113,7 @@ body {
 .barra-progreso {
     height: 100%;
     background-color: #10b981;
+    transition: width 0.4s ease, background-color 0.4s ease;
 }
 
 .cupos-texto {

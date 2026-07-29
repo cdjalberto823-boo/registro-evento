@@ -1,62 +1,71 @@
 const mesasData = {
-    "Mesa 1": { capacidadTotal: 15, ocupados: 0, moderador: "Modera Mesa 1" },
-    "Mesa 2": { capacidadTotal: 15, ocupados: 0, moderador: "Modera Mesa 2" },
-    "Mesa 3": { capacidadTotal: 15, ocupados: 0, moderador: "Modera Mesa 3" },
-    "Mesa 4": { capacidadTotal: 15, ocupados: 0, moderador: "Modera Mesa 4" }
+    "Mesa 1": { capacidadTotal: 15, ocupados: 0 },
+    "Mesa 2": { capacidadTotal: 15, ocupados: 0 },
+    "Mesa 3": { capacidadTotal: 15, ocupados: 0 },
+    "Mesa 4": { capacidadTotal: 15, ocupados: 0 }
 };
 
-let contadorFolio = 0;
-
 document.addEventListener("DOMContentLoaded", () => {
-    // Cargar registros almacenados previamente para restar cupos automáticamente
+    // Cargar registros previos de localStorage
     const registrosPrevios = JSON.parse(localStorage.getItem("asistentes_czm")) || [];
+    
+    // Resetear contador de ocupados
+    for (const key in mesasData) {
+        mesasData[key].ocupados = 0;
+    }
+
     registrosPrevios.forEach(reg => {
         if (mesasData[reg.mesa]) {
             mesasData[reg.mesa].ocupados++;
         }
     });
 
-    renderizarAsientos();
     actualizarInterfazLugares();
     inicializarSeleccionMesas();
     inicializarFormulario();
 });
 
-// Renderizar puntos/asientos alrededor de la mesa
-function renderizarAsientos() {
-    const mapaIds = {
-        "Mesa 1": "mesa1",
-        "Mesa 2": "mesa2",
-        "Mesa 3": "mesa3",
-        "Mesa 4": "mesa4"
-    };
+// Renderiza el plano SVG con la mesa central y 15 sillas dispuestas alrededor
+function renderizarMesaSVG(idContenedor, ocupados, limite = 15) {
+    const contenedor = document.getElementById(idContenedor);
+    if (!contenedor) return;
 
-    for (const [nombreMesa, info] of Object.entries(mesasData)) {
-        const idSuffix = mapaIds[nombreMesa];
-        const topContainer = document.getElementById(`sillas-top-${idSuffix}`);
-        const bottomContainer = document.getElementById(`sillas-bottom-${idSuffix}`);
+    let svgHtml = `
+    <svg viewBox="0 0 220 160" width="100%" height="130" class="mesa-svg-plano">
+        <!-- Mesa central -->
+        <rect x="50" y="40" width="120" height="80" rx="12" ry="12" fill="#eef2f6" stroke="#cbd5e1" stroke-width="2.5" />
+        <text x="110" y="84" font-size="12" font-weight="700" fill="#475569" text-anchor="middle">MESA</text>
+    `;
 
-        if (topContainer && bottomContainer) {
-            topContainer.innerHTML = "";
-            bottomContainer.innerHTML = "";
+    // Posiciones exactas (x, y) de las 15 sillas alrededor de la mesa
+    const posiciones = [
+        // Arriba (5 sillas)
+        {x: 62, y: 22}, {x: 86, y: 22}, {x: 110, y: 22}, {x: 134, y: 22}, {x: 158, y: 22},
+        // Derecha (3 sillas)
+        {x: 184, y: 54}, {x: 184, y: 80}, {x: 184, y: 106},
+        // Abajo (5 sillas)
+        {x: 158, y: 138}, {x: 134, y: 138}, {x: 110, y: 138}, {x: 86, y: 138}, {x: 62, y: 138},
+        // Izquierda (2 sillas)
+        {x: 36, y: 93}, {x: 36, y: 67}
+    ];
 
-            for (let i = 0; i < info.capacidadTotal; i++) {
-                const silla = document.createElement("span");
-                silla.classList.add("silla-dot");
-                silla.classList.add(i < info.ocupados ? "ocupado" : "disponible");
+    for (let i = 0; i < limite; i++) {
+        const estaOcupada = i < ocupados;
+        const colorSilla = estaOcupada ? "#cbd5e1" : "#10b981"; // Gris = Ocupado | Verde = Disponible
+        const pos = posiciones[i];
 
-                // Distribución visual de los 15 asientos: 8 arriba y 7 abajo
-                if (i < 8) {
-                    topContainer.appendChild(silla);
-                } else {
-                    bottomContainer.appendChild(silla);
-                }
-            }
-        }
+        svgHtml += `
+            <circle cx="${pos.x}" cy="${pos.y}" r="7.5" fill="${colorSilla}" class="silla-node ${estaOcupada ? 'ocupada' : 'disponible'}">
+                <title>Asiento ${i + 1}: ${estaOcupada ? 'Ocupado' : 'Disponible'}</title>
+            </circle>
+        `;
     }
+
+    svgHtml += `</svg>`;
+    contenedor.innerHTML = svgHtml;
 }
 
-// Actualizar barras de progreso y textos de disponibilidad
+// Actualizar barras de progreso, plano SVG y contadores
 function actualizarInterfazLugares() {
     const mapaIds = {
         "Mesa 1": "mesa1",
@@ -70,6 +79,9 @@ function actualizarInterfazLugares() {
         const disponibles = info.capacidadTotal - info.ocupados;
         const porcentaje = (disponibles / info.capacidadTotal) * 100;
 
+        // Renderizar el plano SVG
+        renderizarMesaSVG(`plano-${idSuffix}`, info.ocupados, info.capacidadTotal);
+
         const txtElemento = document.getElementById(`txt-${idSuffix}`);
         const barElemento = document.getElementById(`bar-${idSuffix}`);
 
@@ -82,15 +94,13 @@ function actualizarInterfazLugares() {
             } else if (disponibles <= 7) {
                 barElemento.style.backgroundColor = "#f59e0b";
             } else {
-                barElemento.style.backgroundColor = "#22c55e";
+                barElemento.style.backgroundColor = "#10b981";
             }
         }
     }
-
-    renderizarAsientos();
 }
 
-// Selección visual interactiva de tarjetas
+// Selección interactiva de tarjetas
 function inicializarSeleccionMesas() {
     const tarjetasMesa = document.querySelectorAll(".mesa-card");
     const campoMesaOculto = document.getElementById("mesaSeleccionada");
@@ -112,7 +122,7 @@ function inicializarSeleccionMesas() {
     });
 }
 
-// Procesar el registro y abrir el modal con resumen de confirmación
+// Registro del formulario y modal
 function inicializarFormulario() {
     const btnRegistrar = document.getElementById("btnRegistrar");
 
@@ -126,7 +136,6 @@ function inicializarFormulario() {
             const correo = document.getElementById("correo").value.trim();
             const mesaSeleccionada = document.getElementById("mesaSeleccionada").value;
 
-            // Validación de todos los campos obligatorios
             if (!nombre || !cargo || !telefono || !correo) {
                 alert("⚠️ Por favor completa todos los campos del formulario (Nombre, Cargo, Teléfono y Correo).");
                 return;
@@ -137,17 +146,13 @@ function inicializarFormulario() {
                 return;
             }
 
-            // Actualizar disponibilidad interna
             if (mesasData[mesaSeleccionada]) {
                 mesasData[mesaSeleccionada].ocupados++;
                 actualizarInterfazLugares();
             }
 
-            // Generar folio único
-            contadorFolio++;
             const folioFormateado = `CZM-${String(Date.now()).slice(-5)}`;
 
-            // Guardar registro completo en localStorage (incluyendo correo)
             const nuevoRegistro = {
                 folio: folioFormateado,
                 nombre: nombre,
@@ -162,17 +167,14 @@ function inicializarFormulario() {
             registrosGuardados.push(nuevoRegistro);
             localStorage.setItem("asistentes_czm", JSON.stringify(registrosGuardados));
 
-            // Cargar datos en los elementos del Modal
             document.getElementById("modalFolio").textContent = folioFormateado;
             document.getElementById("modalNombre").textContent = nombre;
             document.getElementById("modalCargo").textContent = cargo;
             document.getElementById("modalMesa").textContent = mesaSeleccionada;
 
-            // Desplegar el Modal de Bootstrap
             const modalConfirmacion = new bootstrap.Modal(document.getElementById('modalConfirmacion'));
             modalConfirmacion.show();
 
-            // Limpiar campos automáticamente cuando el modal se cierre (al dar clic en Aceptar)
             document.getElementById('modalConfirmacion').addEventListener('hidden.bs.modal', function () {
                 document.getElementById("registroForm").reset();
                 document.querySelectorAll(".mesa-card").forEach(m => m.classList.remove("seleccionada"));

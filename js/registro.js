@@ -6,10 +6,10 @@ const mesasData = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Cargar registros previos de localStorage
+    // Cargar registros previos de localStorage para sincronizar cupos
     const registrosPrevios = JSON.parse(localStorage.getItem("asistentes_czm")) || [];
     
-    // Resetear contador de ocupados
+    // Resetear contador de ocupados antes de recalcular
     for (const key in mesasData) {
         mesasData[key].ocupados = 0;
     }
@@ -25,17 +25,24 @@ document.addEventListener("DOMContentLoaded", () => {
     inicializarFormulario();
 });
 
-// Renderiza el plano SVG con la mesa central, el ícono temático y sus 15 sillas
+// Renderiza el plano SVG con la mesa central, el ícono temático exacto y sus 15 sillas
 function renderizarMesaSVG(idContenedor, ocupados, limite = 15, numeroMesa = 1) {
     const contenedor = document.getElementById(idContenedor);
     if (!contenedor) return;
 
-    // Mapa de íconos/simbología según el tema de cada mesa (Bootstrap Icons / SVG Path)
+    // Íconos exactos de Bootstrap Icons (Gobernanza, Financiamiento, Mapa y Gráfica)
     const simbolosMesa = {
-        1: '<path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>', // Gobernanza (Personas)
-        2: '<path d="M5.5 9.5a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0"/><path d="M0 5A1.5 1.5 0 0 1 1.5 3.5h13A1.5 1.5 0 0 1 16 5v6a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 11zm1.5-.5a.5.5 0 0 0-.5.5v1a2.5 2.5 0 0 1 2.5-2.5zm13 0h-1a2.5 2.5 0 0 1 2.5 2.5v-1a.5.5 0 0 0-.5-.5M.5 10v1a.5.5 0 0 0 .5.5h1a2.5 2.5 0 0 1-2.5-2.5m15 1a2.5 2.5 0 0 1-2.5 2.5h1a.5.5 0 0 0 .5-.5z"/>', // Financiamiento (Billetes)
-        3: '<path d="M2 1a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zm12 1v2.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5V2zM2 6h12v7H2z"/>', // Planeación Territorial (Mapa/Plano)
-        4: '<path d="M1 11a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"/>' // Información y Evaluación (Gráfica)
+        // Mesa 1: Gobernanza (Personas - bi-people-fill)
+        1: '<path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>',
+        
+        // Mesa 2: Financiamiento (Moneda/Efectivo - bi-cash-coin)
+        2: '<path d="M8 3c-1.552 0-2.84.07-3.68.136-.51.04-.82.115-.82.115l-.01.002h-.002L3.48 3.26a1.5 1.5 0 0 0-1.22 1.22l-.009.008C2.25 4.5 2.175 4.81 2.135 5.32 2.07 6.16 2 7.448 2 9c0 1.552.07 2.84.136 3.68.04.51.115.82.115.82l.002.01h.002l.008.008a1.5 1.5 0 0 0 1.22 1.22l.008.009c.012.001.322.076.832.116C5.16 14.93 6.448 15 8 15c1.552 0 2.84-.07 3.68-.136.51-.04.82-.115.82-.115l.01-.002h.002l.008-.008a1.5 1.5 0 0 0 1.22-1.22l.009-.008c.001-.012.076-.322.116-.832C13.93 11.84 14 10.552 14 9c0-1.552-.07-2.84-.136-3.68-.04-.51-.115-.82-.115-.82l-.002-.01h-.002l-.008-.008a1.5 1.5 0 0 0-1.22-1.22l-.008-.009c-.012-.001-.322-.076-.832-.116C10.84 3.07 9.552 3 8 3m-2.5 6a2.5 2.5 0 1 1 5 0 2.5 2.5 0 0 1-5 0"/>',
+        
+        // Mesa 3: Planeación Territorial (Mapa - bi-map-fill)
+        3: '<path fill-rule="evenodd" d="M16 5.35s-1.555-.597-3.73-.238c-2.029.336-3.882 1.547-5.918 1.547-2.035 0-3.888-1.21-5.918-1.547C-.14 5.053-1 .253-1 .253V10.8a1 1 0 0 0 .524.872c1.787.973 3.682.748 5.706.748 2.036 0 3.888 1.21 5.918 1.547 2.175.36 3.73-.238 3.73-.238V5.35zM6 3.61c1.867 0 3.593 1.11 5.5 1.425v7.2c-1.907-.315-3.633-1.425-5.5-1.425s-3.633 1.11-5.5 1.425V5.035C2.367 4.72 4.093 3.61 6 3.61z"/>',
+        
+        // Mesa 4: Información y Evaluación (Gráfica de barras - bi-bar-chart-fill)
+        4: '<path d="M1 11a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"/>'
     };
 
     let svgHtml = `
@@ -43,8 +50,8 @@ function renderizarMesaSVG(idContenedor, ocupados, limite = 15, numeroMesa = 1) 
         <!-- Mesa central -->
         <rect x="50" y="40" width="120" height="80" rx="12" ry="12" fill="#eef2f6" stroke="#cbd5e1" stroke-width="2.5" />
         
-        <!-- Ícono temático al centro de la mesa -->
-        <g transform="translate(100, 68) scale(1.2)" fill="#004d43">
+        <!-- Ícono temático exacto al centro de la mesa -->
+        <g transform="translate(101, 69) scale(1.3)" fill="#004d43">
             ${simbolosMesa[numeroMesa] || simbolosMesa[1]}
         </g>
     `;
@@ -77,7 +84,7 @@ function renderizarMesaSVG(idContenedor, ocupados, limite = 15, numeroMesa = 1) 
     contenedor.innerHTML = svgHtml;
 }
 
-// Actualizar barras de progreso, plano SVG y contadores
+// Actualizar barras de progreso, plano SVG y contadores en tiempo real
 function actualizarInterfazLugares() {
     const mapaIds = {
         "Mesa 1": { id: "mesa1", num: 1 },
@@ -91,7 +98,7 @@ function actualizarInterfazLugares() {
         const disponibles = info.capacidadTotal - info.ocupados;
         const porcentaje = (disponibles / info.capacidadTotal) * 100;
 
-        // Renderizar el plano SVG con su ícono temático
+        // Renderizar el plano SVG con su ícono temático correspondiente
         renderizarMesaSVG(`plano-${datosMesa.id}`, info.ocupados, info.capacidadTotal, datosMesa.num);
 
         const txtElemento = document.getElementById(`txt-${datosMesa.id}`);
@@ -134,7 +141,7 @@ function inicializarSeleccionMesas() {
     });
 }
 
-// Registro del formulario y modal
+// Registro del formulario y modal de confirmación
 function inicializarFormulario() {
     const btnRegistrar = document.getElementById("btnRegistrar");
 

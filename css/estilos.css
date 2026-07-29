@@ -78,3 +78,24 @@ body {
     display: inline-block;
     filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.1));
 }
+
+/* Tipografía responsiva para el título principal */
+h1, .titulo-principal, .banner-title {
+    font-size: clamp(1.6rem, 5vw, 3.2rem) !important;
+    line-height: 1.25 !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Ajustes de márgenes y contenedor en pantallas pequeñas (móviles) */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+    
+    /* Reduce el subtítulo en pantallas pequeñas */
+    .subtitulo-banner, p.lead {
+        font-size: 1rem !important;
+    }
+}

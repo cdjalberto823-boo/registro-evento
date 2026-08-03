@@ -22,7 +22,6 @@
             min-height: 100vh;
         }
 
-        /* Encabezado Verde Institucional */
         .header-admin {
             background-color: #004d43;
             color: white;
@@ -30,7 +29,6 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
-        /* Contenedor de la tabla */
         .card-table {
             border: none;
             border-radius: 0 0 16px 16px;
@@ -39,7 +37,6 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
         }
 
-        /* Estilos de Pestañas (Tabs) */
         .nav-tabs {
             border-bottom: none;
         }
@@ -61,7 +58,6 @@
             border-top: 3px solid #004d43;
         }
 
-        /* Tabla */
         .table-dark-verde {
             background-color: #004d43 !important;
             color: white !important;
@@ -73,7 +69,6 @@
             color: white;
         }
 
-        /* Modal de Acceso */
         .modal-access {
             backdrop-filter: blur(8px);
             background-color: rgba(0, 0, 0, 0.5);
@@ -90,7 +85,6 @@
             color: white;
         }
 
-        /* Reglas de Impresión Limpia */
         @media print {
             .no-imprimir {
                 display: none !important;
@@ -142,7 +136,7 @@
         </div>
     </div>
 
-    <!-- CONTENIDO DEL PANEL (Oculto hasta validar contraseña) -->
+    <!-- CONTENIDO DEL PANEL -->
     <div id="panelContent" class="d-none">
 
         <!-- Header del Panel -->
@@ -155,7 +149,7 @@
 
         <div class="container py-4">
 
-            <!-- Formato Oficial de Impresión (Solo visible al mandar a imprimir) -->
+            <!-- Formato Oficial de Impresión -->
             <div class="encabezado-impresion text-center mb-4">
                 <h3 class="fw-bold text-uppercase mb-1">CÁMARA DE DIPUTADOS · LXVI LEGISLATURA</h3>
                 <h5>Comisión de Zonas Metropolitanas</h5>
@@ -171,7 +165,7 @@
                     <button class="btn btn-dark me-2" onclick="window.print()">
                         <i class="bi bi-printer-fill me-2"></i>Imprimir Categoría Actual
                     </button>
-                    <button class="btn btn-outline-danger" onclick="limpiarRegistros()">
+                    <button class="btn btn-outline-danger" id="btnLimpiar">
                         <i class="bi bi-trash-fill me-1"></i> Limpiar Todo
                     </button>
                 </div>
@@ -211,7 +205,7 @@
                                 </tr>
                             </thead>
                             <tbody id="tablaCuerpo">
-                                <!-- Datos cargados con JavaScript -->
+                                <!-- Datos cargados con Firebase en tiempo real -->
                             </tbody>
                         </table>
                     </div>
@@ -221,13 +215,31 @@
         </div>
     </div>
 
-    <!-- Script de Autenticación y Carga -->
-    <script>
-        // Contraseña por defecto para ingresar
-        const CODIGO_CORRECTO = "admin823"; 
-        let mesaActual = 'Mesa 1';
+    <!-- Script de Autenticación y Carga desde Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        function validarAcceso(event) {
+        const firebaseConfig = {
+            apiKey: "AIzaSyAPz_pPawGZ8CCWsfK377EQtB-CFto9Ryg",
+            authDomain: "seleccion-de-mesas.firebaseapp.com",
+            databaseURL: "https://seleccion-de-mesas-default-rtdb.firebaseio.com",
+            projectId: "seleccion-de-mesas",
+            storageBucket: "seleccion-de-mesas.firebasestorage.app",
+            messagingSenderId: "781892920883",
+            appId: "1:781892920883:web:906f522e1a50a35107a546",
+            measurementId: "G-XRED4DQ11R"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const registrosRef = ref(db, "registros");
+
+        const CODIGO_CORRECTO = "admin823";
+        let mesaActual = 'Mesa 1';
+        let todosLosRegistros = [];
+
+        window.validarAcceso = function(event) {
             event.preventDefault();
             const passwordInput = document.getElementById("adminPassword").value;
             const errorMsg = document.getElementById("errorMsg");
@@ -240,11 +252,10 @@
             } else {
                 errorMsg.classList.remove("d-none");
             }
-        }
+        };
 
-        function filtrarMesa(nombreMesa) {
+        window.filtrarMesa = function(nombreMesa) {
             mesaActual = nombreMesa;
-            
             const links = document.querySelectorAll('.nav-tabs .nav-link');
             links.forEach(link => {
                 if(link.textContent.includes(nombreMesa) || (nombreMesa === 'Todas' && link.textContent.includes('Todas'))) {
@@ -257,16 +268,28 @@
             document.getElementById("tituloImpresion").textContent = 
                 nombreMesa === 'Todas' ? 'Lista General de Asistencia' : `Lista de Asistencia — ${nombreMesa}`;
 
-            cargarDatos();
-        }
+            renderTabla();
+        };
 
-        function cargarDatos() {
-            const registros = JSON.parse(localStorage.getItem("asistentes_czm")) || [];
+        // Escuchar datos en tiempo real de Firebase
+        onValue(registrosRef, (snapshot) => {
+            const data = snapshot.val();
+            todosLosRegistros = [];
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    todosLosRegistros.push(data[key]);
+                });
+            }
+            renderTabla();
+        });
+
+        function renderTabla() {
             const tablaCuerpo = document.getElementById("tablaCuerpo");
+            if (!tablaCuerpo) return;
 
             const filtrados = mesaActual === 'Todas' 
-                ? registros 
-                : registros.filter(r => r.mesa === mesaActual);
+                ? todosLosRegistros 
+                : todosLosRegistros.filter(r => r.mesa === mesaActual);
 
             tablaCuerpo.innerHTML = "";
 
@@ -286,21 +309,23 @@
                 const fila = document.createElement("tr");
                 fila.innerHTML = `
                     <td><span class="badge bg-secondary">${reg.folio || 'N/A'}</span></td>
-                    <td class="fw-bold">${reg.nombre}</td>
-                    <td>${reg.cargo}</td>
-                    <td>${reg.telefono}</td>
-                    <td><span class="badge badge-mesa">${reg.mesa}</span></td>
+                    <td class="fw-bold">${reg.nombre || ''}</td>
+                    <td>${reg.cargo || ''}</td>
+                    <td>${reg.telefono || ''}</td>
+                    <td><span class="badge badge-mesa">${reg.mesa || ''}</span></td>
                 `;
                 tablaCuerpo.appendChild(fila);
             });
         }
 
-        function limpiarRegistros() {
-            if (confirm("¿Está seguro de borrar todos los registros recopilados?")) {
-                localStorage.removeItem("asistentes_czm");
-                cargarDatos();
+        // Limpiar base de datos en Firebase
+        document.getElementById("btnLimpiar")?.addEventListener("click", () => {
+            if (confirm("¿Está seguro de borrar todos los registros almacenados en la base de datos?")) {
+                remove(registrosRef)
+                    .then(() => alert("Se han eliminado todos los registros correctamente."))
+                    .catch((err) => alert("Error al borrar los registros: " + err.message));
             }
-        }
+        });
     </script>
 
     <!-- Bootstrap JS Bundle -->

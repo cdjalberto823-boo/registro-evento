@@ -171,22 +171,22 @@
                 </div>
             </div>
 
-            <!-- Pestañas por Mesa -->
+            <!-- Pestañas por Mesa con Título Completo -->
             <ul class="nav nav-tabs no-imprimir" id="mesasTabs">
                 <li class="nav-item">
-                    <button class="nav-link active" onclick="filtrarMesa('Mesa 1')">Mesa 1: Gobernanza</button>
+                    <button class="nav-link active" onclick="filtrarMesa('Mesa 1', 'Mesa 1: Gobernanza')">Mesa 1: Gobernanza</button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link" onclick="filtrarMesa('Mesa 2')">Mesa 2: Financiamiento</button>
+                    <button class="nav-link" onclick="filtrarMesa('Mesa 2', 'Mesa 2: Financiamiento')">Mesa 2: Financiamiento</button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link" onclick="filtrarMesa('Mesa 3')">Mesa 3: Planeación</button>
+                    <button class="nav-link" onclick="filtrarMesa('Mesa 3', 'Mesa 3: Planeación')">Mesa 3: Planeación</button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link" onclick="filtrarMesa('Mesa 4')">Mesa 4: Evaluación</button>
+                    <button class="nav-link" onclick="filtrarMesa('Mesa 4', 'Mesa 4: Evaluación')">Mesa 4: Evaluación</button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link" onclick="filtrarMesa('Todas')">Todas las Mesas</button>
+                    <button class="nav-link" onclick="filtrarMesa('Todas', 'Lista General de Asistencia')">Todas las Mesas</button>
                 </li>
             </ul>
 
@@ -248,14 +248,18 @@
                 document.getElementById("loginModal").classList.remove("show");
                 document.getElementById("loginModal").style.display = "none";
                 document.getElementById("panelContent").classList.remove("d-none");
-                filtrarMesa('Mesa 1');
+                filtrarMesa('Mesa 1', 'Mesa 1: Gobernanza');
             } else {
                 errorMsg.classList.remove("d-none");
             }
         };
 
-        window.filtrarMesa = function(nombreMesa) {
+        window.filtrarMesa = function(nombreMesa, tituloCompleto) {
             mesaActual = nombreMesa;
+            
+            // Si no recibe título completo (por seguridad), usa la clave corta
+            const tituloHeader = tituloCompleto || (nombreMesa === 'Todas' ? 'Lista General de Asistencia' : `Lista de Asistencia — ${nombreMesa}`);
+
             const links = document.querySelectorAll('.nav-tabs .nav-link');
             links.forEach(link => {
                 if(link.textContent.includes(nombreMesa) || (nombreMesa === 'Todas' && link.textContent.includes('Todas'))) {
@@ -265,8 +269,9 @@
                 }
             });
 
+            // Asigna el título completo para la vista de impresión
             document.getElementById("tituloImpresion").textContent = 
-                nombreMesa === 'Todas' ? 'Lista General de Asistencia' : `Lista de Asistencia — ${nombreMesa}`;
+                nombreMesa === 'Todas' ? 'Lista General de Asistencia' : `Lista de Asistencia — ${tituloHeader}`;
 
             renderTabla();
         };

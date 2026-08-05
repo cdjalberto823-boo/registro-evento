@@ -291,6 +291,9 @@
                 ? todosLosRegistros 
                 : todosLosRegistros.filter(r => r.mesa === mesaActual);
 
+            // Ordenar alfabéticamente por Nombre Completo (A-Z)
+            filtrados.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || '', 'es', { sensitivity: 'base' }));
+
             tablaCuerpo.innerHTML = "";
 
             if (filtrados.length === 0) {
